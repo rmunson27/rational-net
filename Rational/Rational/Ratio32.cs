@@ -306,6 +306,14 @@ public readonly record struct Ratio32 : IComparable<Ratio32>, IComparable<TInt>
     public static implicit operator Ratio32(int numerator) => Create(numerator);
     #endregion
 
+    #region ToString
+    /// <summary>
+    /// Gets a string that represents the current instance.
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => $"{Numerator} {RatioFormatting.ComponentSeparator} {Denominator}";
+    #endregion
+
     #region Helpers
     private static void Reduce(ref TInt Numerator, ref TInt Denominator)
     {
