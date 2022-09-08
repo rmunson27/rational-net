@@ -23,7 +23,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="Documentation" Condition="'$(Configuration)' == 'Release'">
-		<DocumentationFile>bin\Release\Rem.Core.Numerics.Rational.xml</DocumentationFile>
+		<DocumentationFile>bin\Release\Rational.xml</DocumentationFile>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Language">
