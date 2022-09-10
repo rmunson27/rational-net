@@ -203,11 +203,11 @@ public readonly record struct DoubleRep
     public DoubleRep(double Double)
     {
         // Translate the double into sign, exponent and mantissa.
-        long bits = BitConverter.DoubleToInt64Bits(Double);
+        var bits = unchecked((ulong)BitConverter.DoubleToInt64Bits(Double));
 
-        IsNegative = (bits & (1L << 63)) != 0;
+        IsNegative = (bits & (1uL << 63)) != 0;
         LiteralExponent = (ushort)((bits >> MantissaBitLength) & MaxLiteralExponent);
-        LiteralMantissa = (ulong)bits & MaxLiteralMantissa;
+        LiteralMantissa = bits & MaxLiteralMantissa;
     }
     #endregion
 
