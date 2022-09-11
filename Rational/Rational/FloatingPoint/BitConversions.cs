@@ -13,7 +13,7 @@ namespace Rem.Core.Numerics.FloatingPoint;
 internal static class BitConversions
 {
     /// <summary>
-    /// Gets the bytes of a <see cref="float"/> as a <see cref="uint"/>.
+    /// Gets the bits of a <see cref="float"/> as a <see cref="uint"/>.
     /// </summary>
     /// <param name="f"></param>
     /// <returns></returns>
@@ -21,7 +21,7 @@ internal static class BitConversions
 #if NET5_0_OR_GREATER
         => unchecked((uint)BitConverter.SingleToInt32Bits(f));
 #else
-        => BitConverter.ToUInt32(BitConverter.GetBytes(f), 0);
+        => Unsafe.As<float, uint>(ref f);
 #endif
 
     /// <summary>
@@ -33,7 +33,7 @@ internal static class BitConversions
 #if NET5_0_OR_GREATER
         => BitConverter.Int32BitsToSingle(unchecked((int)i));
 #else
-        => BitConverter.ToSingle(BitConverter.GetBytes(i), 0);
+        => Unsafe.As<uint, float>(ref i);
 #endif
 
 #if NET5_0_OR_GREATER
