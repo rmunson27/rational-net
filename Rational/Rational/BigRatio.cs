@@ -289,6 +289,24 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// </summary>
     /// <param name="numerator"></param>
     public static implicit operator BigRatio(TInt numerator) => Create(numerator);
+
+    /// <summary>
+    /// Implicitly converts an integer to an equivalent ratio (with a denominator of 1).
+    /// </summary>
+    /// <param name="numerator"></param>
+    public static implicit operator BigRatio(long numerator) => Create(numerator);
+
+    /// <summary>
+    /// Implicitly converts an integer to an equivalent ratio (with a denominator of 1).
+    /// </summary>
+    /// <param name="numerator"></param>
+    public static implicit operator BigRatio(ulong numerator) => Create(numerator);
+
+    /// <summary>
+    /// Implicitly converts an integer to an equivalent ratio (with a denominator of 1).
+    /// </summary>
+    /// <param name="numerator"></param>
+    public static implicit operator BigRatio(int numerator) => Create(numerator);
     #endregion
 
     #region ToString

@@ -62,7 +62,7 @@ public readonly record struct Ratio32 : IComparable<Ratio32>, IComparable<TInt>
     /// Gets the denominator of this instance.
     /// </summary>
     [Positive] public TInt Denominator => _denominator == 0 ? 1 : _denominator;
-    [NonNegative] private readonly TInt _denominator;
+    [NonNegative] internal readonly TInt _denominator;
 
     /// <summary>
     /// Gets the reciprocal (multiplicative inverse) of this instance.
