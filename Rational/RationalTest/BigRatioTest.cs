@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Rem.Core.Numerics.FloatingPoint;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -33,6 +35,7 @@ public class BigRatioTest
     #endregion
 
     #region Factory Methods
+    #region Create
     /// <summary>
     /// Tests the <see cref="TRatio.Create(TInt, TInt)"/> factory method.
     /// </summary>
@@ -65,6 +68,42 @@ public class BigRatioTest
         Assert.That.RatioEquals(1, 5, TRatio.CreateOneOver(5)); // Control - should be unchanged
         Assert.That.RatioEquals(-1, 4, TRatio.CreateOneOver(-4)); // Sign should be propagated through the numerator
     }
+    #endregion
+
+    #region Float Conversions
+    /// <summary>
+    /// Tests the <see cref="TRatio.FromExactDouble(double)"/> factory method.
+    /// </summary>
+    [TestMethod]
+    public void TestFromDouble()
+    {
+        foreach (var (Ratio, Double) in ExactDoubleConversionTests)
+        {
+            Assert.AreEqual(Ratio, TRatio.FromExactDouble(Double), $"Exact double conversion of {Double} failed.");
+        }
+    }
+
+    private static readonly TInt DoublePositiveInfinityInt = TInt.One << (DoubleRep.ExponentBias + 1);
+    private static readonly TInt DoubleMaxValueEpsilonInt
+        = TInt.One << (DoubleRep.ExponentBias - DoubleRep.MantissaBitLength);
+    private static readonly ImmutableArray<(TRatio Ratio, double Double)> ExactDoubleConversionTests
+        = ImmutableArray.CreateRange(new (TRatio, double)[]
+        {
+            (0, 0),
+            (0, -0.0),
+            (1, 1),
+            (2, 2),
+            (TRatio.Create(1, 2), 0.5),
+            (TRatio.Create( // Is exact value of 0.1 as a double
+                TInt.Parse("1000000000000000055511151231257827021181583404541015625"),
+                TInt.Parse("10000000000000000000000000000000000000000000000000000000")),
+             0.1),
+            (TRatio.Create(DoublePositiveInfinityInt - DoubleMaxValueEpsilonInt), double.MaxValue),
+            (TRatio.Create(-(DoublePositiveInfinityInt - DoubleMaxValueEpsilonInt)), double.MinValue),
+            (TRatio.Create(DoublePositiveInfinityInt), double.PositiveInfinity),
+            (TRatio.Create(-DoublePositiveInfinityInt), double.NegativeInfinity),
+        });
+    #endregion
     #endregion
 
     #region Comparison

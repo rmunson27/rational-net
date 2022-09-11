@@ -1,4 +1,5 @@
 ﻿using Rem.Core.Attributes;
+using Rem.Core.Numerics.FloatingPoint;
 using Rem.Core.Numerics.Internal;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ using TInt = BigInteger;
 public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt>
 {
     #region Constants
+    #region Fundamental
     /// <summary>
     /// The <see cref="BigRatio"/> representing negative one.
     /// </summary>
@@ -35,6 +37,39 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// The <see cref="BigRatio"/> representing one.
     /// </summary>
     public static readonly BigRatio One = Create(TInt.One);
+    #endregion
+
+    #region IEEE-754
+    /// <summary>
+    /// The (finite) <see cref="BigRatio"/> representing the numerical interpretation of the IEEE-754
+    /// <see cref="double.PositiveInfinity"/> value.
+    /// </summary>
+    /// <remarks>
+    /// This value is the result of calling the <see cref="FromExactDouble(double)"/> method on
+    /// <see cref="double.PositiveInfinity"/>.
+    /// </remarks>
+    public static readonly BigRatio DoublePositiveInfinity = FromExactDouble(double.PositiveInfinity);
+
+    /// <summary>
+    /// The (finite) <see cref="BigRatio"/> representing the numerical interpretation of the IEEE-754
+    /// <see cref="double.NegativeInfinity"/> value.
+    /// </summary>
+    /// <remarks>
+    /// This value is the result of calling the <see cref="FromExactDouble(double)"/> method on
+    /// <see cref="double.NegativeInfinity"/>.
+    /// </remarks>
+    public static readonly BigRatio DoubleNegativeInfinity = FromExactDouble(double.NegativeInfinity);
+
+    /// <summary>
+    /// The <see cref="BigRatio"/> exactly representing <see cref="double.MaxValue"/>.
+    /// </summary>
+    public static readonly BigRatio DoubleMaxValue = FromExactDouble(double.MaxValue);
+
+    /// <summary>
+    /// The <see cref="BigRatio"/> exactly representing <see cref="double.MinValue"/>.
+    /// </summary>
+    public static readonly BigRatio DoubleMinValue = FromExactDouble(double.MinValue);
+    #endregion
     #endregion
 
     #region Properties And Fields
@@ -88,6 +123,7 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
 
     #region Methods
     #region Factory
+    #region Create
     /// <summary>
     /// Creates a new <see cref="BigRatio"/> with the given numerator and denominator.
     /// </summary>
@@ -136,6 +172,51 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static BigRatio CreateInternalFormat(TInt Numerator, [NonNegative] TInt Denominator)
         => new(Numerator, Numerator.IsZero ? TInt.Zero : Denominator);
+    #endregion
+
+    #region Float Conversions
+    /// <summary>
+    /// Creates a <see cref="BigRatio"/> from the exact <see cref="double"/> value passed in.
+    /// </summary>
+    /// <remarks>
+    /// This method will return a <see cref="BigRatio"/> that is <i>exactly</i> equivalent to the value passed in,
+    /// even if the value has a shorter round-trip representation.  For example, while the method will return 1/4
+    /// when passed the value 0.25 since the value 0.25 has an exact representation in the <see cref="double"/> type,
+    /// passing in the value 0.1 will cause the method to return a ratio equal to the decimal
+    /// value 0.1000000000000000055511151231257827021181583404541015625.
+    /// 
+    /// <para/>
+    /// 
+    /// When passed an infinite value, this method will return the value numerically represented by the IEEE-754
+    /// double-precision representation of the value.
+    /// </remarks>
+    /// <param name="d"></param>
+    /// <returns></returns>
+    /// <exception cref="ArithmeticException"><paramref name="d"/> was a not-a-number (NaN) value.</exception>
+    public static BigRatio FromExactDouble(double d)
+    {
+        if (double.IsNaN(d))
+        {
+            throw new ArithmeticException("Floating point not-a-number (NaN) values are not permitted.");
+        }
+
+        // Split the components of the double value into normalized sign, exponent and mantissa
+        // Infinite values will be treated like finite values - converting back will yield the same infinity that was
+        // passed in
+        new DoubleRep(d).TryGetNormalizedLogical(out var isNegative, out var exp, out var mantissa);
+
+        // Combine the mantissa and sign by treating the mantissa as a long (cannot overflow since is at most 53 bits)
+        var longMantissa = unchecked((long)mantissa);
+        if (isNegative) longMantissa = -longMantissa;
+
+        return exp switch
+        {
+            < 0 => Create(longMantissa, TInt.One << (-exp)),
+            0 => Create(longMantissa),
+            > 0 => Create(longMantissa * TInt.One << exp),
+        };
+    }
+    #endregion
     #endregion
 
     #region Equality
