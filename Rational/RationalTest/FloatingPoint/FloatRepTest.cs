@@ -14,7 +14,7 @@ namespace RemTest.Core.Numerics.FloatingPoint;
 public class FloatRepTest
 {
     private const float MaxNegativeValue = -MinPositiveValue;
-    private const float MinPositiveValue = 1.4013e-45f;
+    private const float MinPositiveValue = float.Epsilon;
 
     /// <summary>
     /// Performs a series of round robin tests to ensure that the representations can be converted back to their

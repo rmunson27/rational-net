@@ -14,7 +14,7 @@ namespace RemTest.Core.Numerics.FloatingPoint;
 public class DoubleRepTest
 {
     private const double MaxNegativeValue = -MinPositiveValue;
-    private const double MinPositiveValue = 4.9406564584124654417656879286822137236505980261432476443E-324;
+    private const double MinPositiveValue = double.Epsilon;
 
     /// <summary>
     /// Performs a series of round robin tests to ensure that the representations can be converted back to their
