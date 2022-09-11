@@ -287,6 +287,12 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// <summary>
     /// Implicitly converts an integer to an equivalent ratio (with a denominator of 1).
     /// </summary>
+    /// <param name="ratio"></param>
+    public static implicit operator BigRatio(Ratio32 ratio) => new(ratio.Numerator, ratio._denominator);
+
+    /// <summary>
+    /// Implicitly converts an integer to an equivalent ratio (with a denominator of 1).
+    /// </summary>
     /// <param name="numerator"></param>
     public static implicit operator BigRatio(TInt numerator) => Create(numerator);
 
