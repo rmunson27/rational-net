@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +12,18 @@ namespace RemTest.Core.Numerics;
 /// </summary>
 internal static class AssertExtensions
 {
+    #region RatioEquals
+    /// <inheritdoc cref="RatioEquals(Assert, BigInteger, BigInteger, BigRatio, string)"/>
+    public static void RatioEquals(
+        this Assert _,
+        int expectedNumerator, int expectedDenominator,
+        Ratio32 actualRatio,
+        string message = "")
+    {
+        Assert.AreEqual(expectedNumerator, actualRatio.Numerator, message);
+        Assert.AreEqual(expectedDenominator, actualRatio.Denominator, message);
+    }
+
     /// <summary>
     /// Asserts that the ratio passed in matches the expected components.
     /// </summary>
@@ -25,11 +38,12 @@ internal static class AssertExtensions
     /// <param name="message"></param>
     public static void RatioEquals(
         this Assert _,
-        int expectedNumerator, int expectedDenominator,
-        Ratio32 actualRatio,
+        BigInteger expectedNumerator, BigInteger expectedDenominator,
+        BigRatio actualRatio,
         string message = "")
     {
         Assert.AreEqual(expectedNumerator, actualRatio.Numerator, message);
         Assert.AreEqual(expectedDenominator, actualRatio.Denominator, message);
     }
+    #endregion
 }
