@@ -39,7 +39,7 @@ public readonly record struct DoubleRep
     /// <summary>
     /// The bias of the exponent of a <see cref="double"/>.
     /// </summary>
-    public const int ExponentBias = 1023;
+    public const ushort ExponentBias = 1023;
 
     /// <summary>
     /// The maximum literal exponent value of finite <see cref="double"/> values.
@@ -206,7 +206,7 @@ public readonly record struct DoubleRep
         var bits = unchecked((ulong)BitConverter.DoubleToInt64Bits(Double));
 
         IsNegative = (bits & (1uL << 63)) != 0;
-        LiteralExponent = (ushort)((bits >> MantissaBitLength) & MaxLiteralExponent);
+        LiteralExponent = unchecked((ushort)((bits >> MantissaBitLength) & MaxLiteralExponent));
         LiteralMantissa = bits & MaxLiteralMantissa;
     }
     #endregion

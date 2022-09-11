@@ -39,7 +39,7 @@ public readonly record struct FloatRep
     /// <summary>
     /// The bias of the exponent of a <see cref="float"/>.
     /// </summary>
-    public const int ExponentBias = 127;
+    public const byte ExponentBias = 127;
 
     /// <summary>
     /// The maximum literal exponent value of finite <see cref="float"/> values.
@@ -206,7 +206,7 @@ public readonly record struct FloatRep
         var bits = BitConversions.SingleToUInt32Bits(Float);
 
         IsNegative = (bits & (1u << 31)) != 0;
-        LiteralExponent = (byte)((bits >> MantissaBitLength) & MaxLiteralExponent);
+        LiteralExponent = unchecked((byte)((bits >> MantissaBitLength) & MaxLiteralExponent));
         LiteralMantissa = bits & MaxLiteralMantissa;
     }
     #endregion
