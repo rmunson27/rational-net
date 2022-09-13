@@ -1,5 +1,4 @@
-﻿using Rem.Core.Numerics.FloatingPoint;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -83,9 +82,9 @@ public class BigRatioTest
         }
     }
 
-    private static readonly TInt DoublePositiveInfinityInt = TInt.One << (DoubleRep.ExponentBias + 1);
+    private static readonly TInt DoublePositiveInfinityInt = TInt.One << (DoubleComponents.ExponentBias + 1);
     private static readonly TInt DoubleMaxValueEpsilonInt
-        = TInt.One << (DoubleRep.ExponentBias - DoubleRep.MantissaBitLength);
+        = TInt.One << (DoubleComponents.ExponentBias - DoubleComponents.MantissaBitLength);
     private static readonly ImmutableArray<(TRatio Ratio, double Double)> ExactDoubleConversionTests
         = ImmutableArray.CreateRange(new (TRatio, double)[]
         {

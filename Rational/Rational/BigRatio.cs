@@ -1,5 +1,4 @@
 ﻿using Rem.Core.Attributes;
-using Rem.Core.Numerics.FloatingPoint;
 using Rem.Core.Numerics.Internal;
 using System;
 using System.Collections.Generic;
@@ -203,11 +202,11 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
         // Split the components of the double value into normalized sign, exponent and mantissa
         // Infinite values will be treated like finite values - converting back will yield the same infinity that was
         // passed in
-        new DoubleRep(d).TryGetNormalizedLogical(out var isNegative, out var exp, out var mantissa);
+        new DoubleComponents(d).TryGetNormalizedLogical(out var sign, out var exp, out var mantissa);
 
         // Combine the mantissa and sign by treating the mantissa as a long (cannot overflow since is at most 53 bits)
         var longMantissa = unchecked((long)mantissa);
-        if (isNegative) longMantissa = -longMantissa;
+        if (sign < 0) longMantissa = -longMantissa;
 
         return exp switch
         {
