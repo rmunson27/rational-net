@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rem.Core.Numerics.Digits;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -30,6 +31,49 @@ public class BigRatioTest
         Assert.That.RatioEquals(-4, 1, TRatio.CreateOneOver(-4).Reciprocal);
 
         Assert.ThrowsException<DivideByZeroException>(() => TRatio.Create(0).Reciprocal);
+    }
+    #endregion
+
+    #region Representation
+    private static readonly ImmutableArray<(TRatio Ratio, ExpectedRatioDigitRep ExpectedRep)> RatioRepTests
+        = ImmutableArray.CreateRange(new (TRatio, ExpectedRatioDigitRep)[]
+        {
+            // Integers
+            (TRatio.Zero, new(IsNegative: false, ByteDigitList.Empty, ByteDigitList.Empty)),
+            (TRatio.One, new(IsNegative: false, ByteDigitList.CreateRange(1), ByteDigitList.Empty)),
+            (TRatio.NegativeOne, new(IsNegative: true, ByteDigitList.CreateRange(1), ByteDigitList.Empty)),
+
+            // Terminating
+            (TRatio.Create(1, 2),
+             new(IsNegative: false, ByteDigitList.Empty, ByteDigitList.CreateRange(5))),
+            (TRatio.Create(9, -5),
+             new(IsNegative: true, ByteDigitList.CreateRange(1), ByteDigitList.CreateRange(8))),
+            (TRatio.Create(17, 8),
+             new(IsNegative: false, ByteDigitList.CreateRange(2), ByteDigitList.CreateRange(1, 2, 5))),
+
+            // Repeating
+            (TRatio.Create(1, 3),
+             new(IsNegative: false, ByteDigitList.Empty, ByteDigitList.Empty, ByteDigitList.CreateRange(3))),
+            (TRatio.Create(-5, 6),
+             new(IsNegative: true, ByteDigitList.Empty, ByteDigitList.CreateRange(8), ByteDigitList.CreateRange(3))),
+            (TRatio.Create(723, 70),
+             new(IsNegative: false,
+                 Whole: ByteDigitList.CreateRange(1, 0),
+                 Terminating: ByteDigitList.CreateRange(3), Repeating: ByteDigitList.CreateRange(2, 8, 5, 7, 1, 4))),
+        });
+
+    /// <summary>
+    /// Tests the <see cref="TRatio.RepresentInBase(TInt)"/> method.
+    /// </summary>
+    [TestMethod]
+    public void TestRepresentInBase()
+    {
+        foreach (var (ratio, expectedRep) in RatioRepTests)
+        {
+            Assert.That.RatioDigitRepEquals(
+                expectedRep, ratio.RepresentInBase(10),
+                $"Representation of ratio {ratio} was not as expected.");
+        }
     }
     #endregion
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rem.Core.Numerics.Digits;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -12,7 +13,8 @@ namespace RemTest.Core.Numerics;
 /// </summary>
 internal static class AssertExtensions
 {
-    #region RatioEquals
+    #region Equality
+    #region Ratio
     /// <inheritdoc cref="RatioEquals(Assert, BigInteger, BigInteger, BigRatio, string)"/>
     public static void RatioEquals(
         this Assert _,
@@ -45,5 +47,27 @@ internal static class AssertExtensions
         Assert.AreEqual(expectedNumerator, actualRatio.Numerator, message);
         Assert.AreEqual(expectedDenominator, actualRatio.Denominator, message);
     }
+    #endregion
+
+    #region RatioDigitRep
+    /// <summary>
+    /// Asserts that the properties of the <see cref="RatioDigitRep"/> passed in matches the expected values passed in.
+    /// </summary>
+    /// <param name="_"></param>
+    /// <param name="expectedRep"></param>
+    /// <param name="actualRep"></param>
+    /// <param name="message"></param>
+    public static void RatioDigitRepEquals(
+        this Assert _,
+        ExpectedRatioDigitRep expectedRep,
+        RatioDigitRep actualRep,
+        string message = "")
+    {
+        Assert.AreEqual(expectedRep.IsNegative, actualRep.IsNegative, message);
+        Assert.AreEqual(expectedRep.Whole, actualRep.Whole, message);
+        Assert.AreEqual(expectedRep.Terminating, actualRep.Terminating, message);
+        Assert.AreEqual(expectedRep.Repeating, actualRep.Repeating, message);
+    }
+    #endregion
     #endregion
 }

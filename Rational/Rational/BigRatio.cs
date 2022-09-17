@@ -1,4 +1,5 @@
 ﻿using Rem.Core.Attributes;
+using Rem.Core.Numerics.Digits;
 using Rem.Core.Numerics.Internal;
 using System;
 using System.Collections.Generic;
@@ -233,6 +234,7 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     public override int GetHashCode() => HashCode.Combine(Numerator, _denominator);
     #endregion
 
+    #region Computation
     #region Arithmetic
     /// <summary>
     /// Computes the additive inverse of the ratio passed in.
@@ -240,6 +242,73 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// <param name="r"></param>
     /// <returns></returns>
     public static BigRatio operator -(in BigRatio r) => new(-r.Numerator, r._denominator);
+    #endregion
+
+    #region Representation
+    /// <summary>
+    /// Gets a representation for the ratio in the given base.
+    /// </summary>
+    /// <param name="Base">The base to compute the representation in.</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="Base"/> was less than 2.</exception>
+    public RatioDigitRep RepresentInBase([GreaterThanOrEqualToInteger(2)] TInt Base)
+        => RepresentInBaseInternal(Numerator, _denominator, Base);
+
+    internal static RatioDigitRep RepresentInBaseInternal(
+        TInt Numerator,
+        TInt Denominator,
+        [GreaterThanOrEqualToInteger(2)] TInt Base)
+    {
+        Throw.IfArgLessThan(2, Base, nameof(Base));
+
+        // Avoid having to do long division if we have a whole number
+        if (Denominator.IsZero || Denominator.IsOne)
+        {
+            var numeratorRep = DigitReps.InBase(Numerator, Base);
+            return new(
+                IsNegative: Numerator.Sign < 0,
+                Base,
+                numeratorRep.Digits, DigitList.EmptyFromBaseSize(Base), null);
+        }
+
+        // Try to avoid storing big integers as digits and remainders if possible, since there could be as many
+        // entries as the denominator is large in the worst case
+        var digitListBuilder = DigitList.Builder.NewFromBaseSize(Base);
+        var remainderMap = RemainderMap.NewFromDenominatorSize(Denominator);
+
+        bool isNegative = Numerator.Sign < 0;
+        var posNumerator = isNegative ? -Numerator : Numerator;
+
+        var whole = TInt.DivRem(posNumerator, Denominator, out var remainder);
+        var wholeRep = DigitReps.InBase(whole, Base).Digits;
+
+        int fractionalIndex = 0;
+        remainderMap.AddIfNotExists(remainder, fractionalIndex, out _); // Cannot fail
+
+        while (true) // Will run until return condition is encountered
+        {
+            fractionalIndex++;
+            remainder *= Base;
+            var digit = TInt.DivRem(remainder, Denominator, out remainder);
+            digitListBuilder.Add(digit);
+
+            if (remainder.IsZero) // Reached the end of a terminating expansion
+            {
+                return new(isNegative, Base, wholeRep, digitListBuilder.ToList(), Repeating: null);
+            }
+
+            else if (!remainderMap.AddIfNotExists(remainder, fractionalIndex, out var repeatStartIndex))
+            {
+                // Reached the end of a repeat
+                // Split the digits into terminating and repeating portion
+                var digitsSplit = digitListBuilder.ToList().SplitAtIndices(repeatStartIndex);
+                DigitList terminating = digitsSplit[0], repeating = digitsSplit[1];
+
+                return new(isNegative, Base, wholeRep, terminating, repeating);
+            }
+        }
+    }
+    #endregion
     #endregion
 
     #region Comparison
