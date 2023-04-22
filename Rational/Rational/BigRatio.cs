@@ -27,17 +27,16 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// <summary>
     /// The <see cref="BigRatio"/> representing negative one.
     /// </summary>
-    public static readonly BigRatio NegativeOne = Create(TInt.MinusOne);
 
     /// <summary>
     /// The <see cref="BigRatio"/> representing zero.
     /// </summary>
-    public static readonly BigRatio Zero = default;
+    public static BigRatio Zero { get; } = default;
 
     /// <summary>
     /// The <see cref="BigRatio"/> representing one.
     /// </summary>
-    public static readonly BigRatio One = Create(TInt.One);
+    public static BigRatio One { get; } = Create(TInt.One);
     #endregion
 
     #region IEEE-754
@@ -49,7 +48,7 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// This value is the result of calling the <see cref="FromExactDouble(double)"/> method on
     /// <see cref="double.PositiveInfinity"/>.
     /// </remarks>
-    public static readonly BigRatio DoublePositiveInfinity = FromExactDouble(double.PositiveInfinity);
+    public static BigRatio DoublePositiveInfinity { get; } = FromExactDouble(double.PositiveInfinity);
 
     /// <summary>
     /// The (finite) <see cref="BigRatio"/> representing the numerical interpretation of the IEEE-754
@@ -59,17 +58,17 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// This value is the result of calling the <see cref="FromExactDouble(double)"/> method on
     /// <see cref="double.NegativeInfinity"/>.
     /// </remarks>
-    public static readonly BigRatio DoubleNegativeInfinity = FromExactDouble(double.NegativeInfinity);
+    public static BigRatio DoubleNegativeInfinity { get; } = FromExactDouble(double.NegativeInfinity);
 
     /// <summary>
     /// The <see cref="BigRatio"/> exactly representing <see cref="double.MaxValue"/>.
     /// </summary>
-    public static readonly BigRatio DoubleMaxValue = FromExactDouble(double.MaxValue);
+    public static BigRatio DoubleMaxValue { get; } = FromExactDouble(double.MaxValue);
 
     /// <summary>
     /// The <see cref="BigRatio"/> exactly representing <see cref="double.MinValue"/>.
     /// </summary>
-    public static readonly BigRatio DoubleMinValue = FromExactDouble(double.MinValue);
+    public static BigRatio DoubleMinValue { get; } = FromExactDouble(double.MinValue);
     #endregion
     #endregion
 
