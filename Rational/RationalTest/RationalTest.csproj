@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <RootNamespace>RemTest.Core.Numerics</RootNamespace>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
