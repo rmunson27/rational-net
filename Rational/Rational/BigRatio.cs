@@ -1,4 +1,5 @@
 ﻿using Rem.Core.Attributes;
+using Rem.Core.ComponentModel;
 using Rem.Core.Numerics.Digits;
 using Rem.Core.Numerics.Internal;
 using System;
@@ -77,11 +78,6 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// Gets the sign of this instance.
     /// </summary>
     public TInt Sign => Numerator.Sign;
-
-    /// <summary>
-    /// Gets whether or not this instance is a whole number.
-    /// </summary>
-    public bool IsWhole => Denominator.IsOne;
 
     /// <summary>
     /// Gets the numerator of this instance.
@@ -417,6 +413,54 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// <inheritdoc/>
     public int CompareTo(TInt other) => Numerator.CompareTo(other * _denominator);
     #endregion
+    #endregion
+
+    #region Classification
+    /// <summary>
+    /// Determines whether or not this ratio represents the reciprocal of a whole number, returning the number in an
+    /// <see langword="out"/> parameter if so.
+    /// </summary>
+    /// <param name="Value">
+    /// An <see langword="out"/> parameter to set the whole number value of this ratio to if it represents the
+    /// reciprocal of a whole number.
+    /// <para/>
+    /// If this method returns <see langword="false"/>, this parameter will be set to 0.
+    /// </param>
+    /// <returns>
+    /// A <see cref="bool"/> value indicating whether or not this ratio represents the reciprocal of a whole number.
+    /// </returns>
+    public bool IsWholeReciprocal(out BigInteger Value) => IsWholeReciprocal()
+                                                            ? Try.Success(out Value, _denominator)
+                                                            : Try.Failure(out Value);
+
+    /// <summary>
+    /// Determines whether or not this ratio represents the reciprocal of a whole number.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="bool"/> value indicating whether or not this ratio represents the reciprocal of a whole number.
+    /// </returns>
+    public bool IsWholeReciprocal() => Numerator == BigInteger.One;
+
+    /// <summary>
+    /// Determines whether or not this ratio represents a whole number, returning the number in an
+    /// <see langword="out"/> parameter if so.
+    /// </summary>
+    /// <param name="Value">
+    /// An <see langword="out"/> parameter to set the whole number value of this ratio to if it represents a
+    /// whole number.
+    /// <para/>
+    /// If this method returns <see langword="false"/>, this parameter will be set to 0.
+    /// </param>
+    /// <returns>A <see cref="bool"/> value indicating whether or not this ratio represents a whole number.</returns>
+    public bool IsWhole(out BigInteger Value) => IsWhole()
+                                                    ? Try.Success(out Value, Numerator)
+                                                    : Try.Failure(out Value);
+
+    /// <summary>
+    /// Determines whether or not this ratio represents a whole number.
+    /// </summary>
+    /// <returns>A <see cref="bool"/> value indicating whether or not this ratio represents a whole number.</returns>
+    public bool IsWhole() => Denominator == BigInteger.One;
     #endregion
 
     #region Deconstruct

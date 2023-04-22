@@ -1,8 +1,10 @@
-﻿using Rem.Core.Numerics.Digits;
+﻿using Rem.Core.ComponentModel;
+using Rem.Core.Numerics.Digits;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +16,26 @@ namespace RemTest.Core.Numerics;
 internal static class AssertExtensions
 {
     #region Equality
+    #region General
+    /// <summary>
+    /// Determines if the two values are equal.
+    /// </summary>
+    /// <param name="_"></param>
+    /// <param name="expected"></param>
+    /// <param name="actual"></param>
+    /// <param name="comparer"></param>
+    /// <param name="message"></param>
+    /// <typeparam name="T"></typeparam>
+    public static void AreEqual<T>(this Assert _,
+                                   T expected, T actual, IEqualityComparer<T>? comparer, string message = "")
+    {
+        Assert.IsTrue(comparer.DefaultIfNull().Equals(expected, actual),
+                      CombineMessages(
+                        $"Failed asserting that expected {expected} matches actual {actual}.",
+                        string.IsNullOrWhiteSpace(message) ? "" : $" {message}"));
+    }
+    #endregion
+
     #region Ratio
     /// <inheritdoc cref="RatioEquals(Assert, BigInteger, BigInteger, BigRatio, string)"/>
     public static void RatioEquals(
@@ -69,5 +91,37 @@ internal static class AssertExtensions
         Assert.AreEqual(expectedRep.Repeating, actualRep.Repeating, message);
     }
     #endregion
+    #endregion
+
+    #region Try
+    /// <summary>
+    /// Asserts that the given operation succeeds and returns the expected value in an <see langword="out"/> parameter.
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="expectedSuccess"></param>
+    /// <param name="message"></param>
+    /// <typeparam name="TSuccess"></typeparam>
+    public static void Succeeds<TSuccess>(this Assert _, TryFunc<TSuccess> operation, TSuccess expectedSuccess,
+                                          string message = "")
+    {
+        Assert.IsTrue(operation.Invoke(out var actualSuccess), CombineMessages("Operation failed.", message));
+        Assert.That.AreEqual(expectedSuccess, actualSuccess, EqualityComparer<TSuccess>.Default,
+                             CombineMessages("Operation values were not equal.", message));
+    }
+    #endregion
+
+    #region Helpers
+    /// <summary>
+    /// Combines two error messages.
+    /// </summary>
+    /// <param name="first"></param>
+    /// <param name="next"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string CombineMessages(string first, string? next)
+    {
+        if (string.IsNullOrWhiteSpace(next)) return first;
+        else return $"{first} {next}";
+    }
     #endregion
 }

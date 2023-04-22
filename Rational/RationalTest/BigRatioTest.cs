@@ -200,4 +200,26 @@ public class BigRatioTest
         Assert.IsTrue(2 <= two);
     }
     #endregion
+
+    #region Classification
+    /// <summary>
+    /// Tests the <see cref="TRatio.IsWhole"/> method and overloads.
+    /// </summary>
+    [TestMethod]
+    public void TestIsWhole()
+    {
+        static (TRatio Ratio, BigInteger Whole) CreateWhole(BigInteger Whole) => (TRatio.Create(Whole), Whole);
+        foreach (var (ratio, whole) in new BigInteger[] { 0, 3, -2 }.Select(CreateWhole))
+        {
+            Assert.IsTrue(ratio.IsWhole(), $"Value {ratio} was not whole.");
+            Assert.That.Succeeds(ratio.IsWhole, whole, $"Value {ratio} produced incorrect whole value.");
+        }
+
+        foreach (var ratio in new[] { TRatio.Create(3, 2), TRatio.Create(-3, 8) })
+        {
+            Assert.IsFalse(ratio.IsWhole(), $"Value {ratio} was whole.");
+            Assert.IsFalse(ratio.IsWhole(out _), $"Value {ratio} was whole.");
+        }
+    }
+    #endregion
 }
