@@ -21,6 +21,7 @@ using TInt = BigInteger;
 /// All instances of this type are fully simplified.
 /// </remarks>
 public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt>
+                                         IEquatable<TInt>
 {
     #region Constants
     #region Fundamental
@@ -221,6 +222,14 @@ public readonly record struct BigRatio : IComparable<BigRatio>, IComparable<TInt
     /// <param name="other"></param>
     /// <returns></returns>
     public bool Equals(BigRatio other) => Numerator == other.Numerator && _denominator == other._denominator;
+
+    /// <summary>
+    /// Determines if this instance is equal to the integer passed in.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals(TInt other) => _denominator.IsZero // Avoid comparing values until we have to
+                                        && Numerator == other;
 
     /// <summary>
     /// Gets a hash code for this instance.
